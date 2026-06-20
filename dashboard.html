@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>@cristobaldiazp — Sistema de Producción</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --negro: #000000;
+    --carbon: #2a2a2a;
+    --blanco: #f5f5f5;
+    --navy: #1a3a52;
+    --navy-light: #254d6e;
+    --gris: #6b6b6b;
+    --gris-claro: #1a1a1a;
+    --verde: #2d6a4f;
+    --amarillo: #7a5c00;
+    --rojo: #6b1a1a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--negro);
+    color: var(--blanco);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.95);
+    border-bottom: 1px solid #1a1a1a;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; height: 56px;
+    z-index: 100; backdrop-filter: blur(10px);
+  }
+  .nav-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 600; color: var(--blanco);
+    letter-spacing: 0.02em;
+  }
+  .nav-brand span { color: var(--navy-light); }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    padding: 6px 16px; border-radius: 6px; cursor: pointer;
+    font-size: 13px; font-weight: 500; color: var(--gris);
+    border: none; background: none; transition: all 0.2s;
+  }
+  .nav-tab:hover { color: var(--blanco); background: #111; }
+  .nav-tab.active { color: var(--blanco); background: var(--navy); }
+
+  /* LAYOUT */
+  main { margin-top: 56px; padding: 40px; max-width: 1200px; margin-left: auto; margin-right: auto; }
+  main { margin-top: 96px; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--carbon); border: 1px solid #2a2a2a;
+    border-radius: 12px; padding: 24px; margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--navy); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+
+  /* BADGE */
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .badge-ok { background: #0d2b1a; color: #4ade80; border: 1px solid #166534; }
+  .badge-warn { background: #2b1f00; color: #fbbf24; border: 1px solid #92400e; }
+  .badge-dev { background: #1a1a2e; color: #818cf8; border: 1px solid #3730a3; }
+  .badge-block { background: #2b0000; color: #f87171; border: 1px solid #991b1b; }
+
+  /* HEADINGS */
+  h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+  h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; margin-bottom: 20px; }
+  h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; color: var(--blanco); }
+  .subtitle { color: var(--gris); font-size: 14px; margin-bottom: 32px; }
+
+  /* SCRIPT CARD */
+  .script-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 11px; color: var(--navy-light); font-weight: 600;
+    letter-spacing: 0.1em; margin-bottom: 6px;
+  }
+  .script-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .script-sub { font-size: 12px; color: var(--gris); margin-bottom: 12px; }
+  .script-body { font-size: 13px; color: #aaa; line-height: 1.7; margin-bottom: 16px; }
+  .script-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+  /* COMPLETION BAR */
+  .completion-wrap { margin-top: 12px; }
+  .completion-label { font-size: 11px; color: var(--gris); margin-bottom: 4px; display: flex; justify-content: space-between; }
+  .completion-bar { height: 4px; background: #111; border-radius: 2px; overflow: hidden; }
+  .completion-fill { height: 100%; background: var(--navy-light); border-radius: 2px; transition: width 0.5s ease; }
+  .completion-fill.high { background: #4ade80; }
+  .completion-fill.mid { background: var(--navy-light); }
+  .completion-fill.low { background: #f87171; }
+
+  /* ALERT BOX */
+  .alert {
+    border-radius: 8px; padding: 12px 16px; margin-bottom: 12px;
+    font-size: 13px; line-height: 1.5;
+  }
+  .alert-warn { background: #1a1200; border: 1px solid #92400e; color: #fbbf24; }
+  .alert-ok { background: #021a0d; border: 1px solid #166534; color: #4ade80; }
+  .alert-info { background: #0a0f1e; border: 1px solid #3730a3; color: #818cf8; }
+
+  /* IDEA CARD */
+  .idea-card { border-left: 3px solid var(--navy); padding-left: 16px; margin-bottom: 24px; }
+  .idea-letter { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--navy-light); float: left; margin-right: 12px; line-height: 1; }
+  .idea-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .idea-desc { font-size: 13px; color: #aaa; margin-bottom: 10px; line-height: 1.6; }
+  .idea-hook { font-style: italic; color: #888; font-size: 13px; border-left: 2px solid #333; padding-left: 10px; margin-bottom: 10px; }
+  .idea-tags { display: flex; gap: 6px; flex-wrap: wrap; clear: both; }
+  .idea-tag { background: #111; border: 1px solid #2a2a2a; border-radius: 4px; padding: 2px 8px; font-size: 11px; color: #888; }
+
+  /* PIPELINE */
+  .pipeline { display: flex; gap: 0; margin-bottom: 32px; }
+  .pipe-step {
+    flex: 1; text-align: center; padding: 16px 8px;
+    border-top: 2px solid #2a2a2a; position: relative;
+    cursor: pointer; transition: border-color 0.2s;
+  }
+  .pipe-step:hover, .pipe-step.active { border-color: var(--navy-light); }
+  .pipe-step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #111; border: 2px solid #2a2a2a;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600;
+    margin: 0 auto 8px; transition: all 0.2s;
+  }
+  .pipe-step.active .pipe-step-num { background: var(--navy); border-color: var(--navy-light); }
+  .pipe-step-label { font-size: 11px; color: var(--gris); font-weight: 500; }
+  .pipe-step.active .pipe-step-label { color: var(--blanco); }
+
+  .pipe-content { display: none; }
+  .pipe-content.active { display: block; }
+
+  /* STATS */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+  .stat { background: var(--carbon); border: 1px solid #2a2a2a; border-radius: 10px; padding: 20px; text-align: center; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: var(--blanco); }
+  .stat-label { font-size: 12px; color: var(--gris); margin-top: 4px; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 600; color: var(--gris); letter-spacing: 0.05em; text-transform: uppercase; border-bottom: 1px solid #1a1a1a; }
+  td { padding: 12px 12px; font-size: 13px; border-bottom: 1px solid #111; vertical-align: top; }
+  tr:hover td { background: #0a0a0a; }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; }
+  .checklist li { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid #111; font-size: 13px; }
+  .checklist li:last-child { border-bottom: none; }
+  .check-icon { width: 18px; height: 18px; border-radius: 4px; border: 2px solid #333; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; transition: all 0.2s; }
+  .check-icon.done { background: var(--navy); border-color: var(--navy-light); color: white; }
+
+  /* TIMELINE */
+  .timeline { position: relative; }
+  .timeline::before { content: ''; position: absolute; left: 20px; top: 0; bottom: 0; width: 1px; background: #1a1a1a; }
+  .tl-item { display: flex; gap: 20px; padding: 0 0 24px 0; position: relative; }
+  .tl-dot { width: 40px; height: 40px; border-radius: 50%; background: var(--navy); border: 2px solid var(--navy-light); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; z-index: 1; }
+  .tl-body { flex: 1; padding-top: 8px; }
+  .tl-title { font-weight: 600; margin-bottom: 4px; }
+  .tl-desc { font-size: 13px; color: #aaa; }
+  .tl-time { font-size: 11px; color: var(--navy-light); font-weight: 600; letter-spacing: 0.05em; }
+
+  /* DIVIDER */
+  .divider { border: none; border-top: 1px solid #1a1a1a; margin: 32px 0; }
+
+  /* TOGGLE BUTTON */
+  .toggle-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 500;
+    cursor: pointer; border: 1px solid #2a2a2a; background: #111; color: #888;
+    transition: all 0.2s;
+  }
+  .toggle-btn:hover { border-color: var(--navy-light); color: var(--blanco); }
+
+  /* SCROLL */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #0a0a0a; }
+  ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    main { padding: 20px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .pipeline { flex-wrap: wrap; }
+    nav { padding: 0 16px; }
+    .nav-tabs { gap: 0; }
+    .nav-tab { padding: 6px 10px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">@cristobal<span>diazp</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('overview')">Inicio</button>
+    <button class="nav-tab" onclick="showSection('scripts')">Scripts</button>
+    <button class="nav-tab" onclick="showSection('ideas')">Ideas</button>
+    <button class="nav-tab" onclick="showSection('pipeline')">Pipeline</button>
+    <button class="nav-tab" onclick="showSection('redes')">Redes</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- OVERVIEW -->
+<div id="overview" class="section active">
+  <h1>Sistema de Producción</h1>
+  <p class="subtitle">@cristobaldiazp · TikTok / Instagram / YouTube · Inicio julio 2026</p>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num">12</div>
+      <div class="stat-label">Scripts en Drive</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" style="color:#4ade80">8</div>
+      <div class="stat-label">Listos para grabar</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" style="color:#fbbf24">4</div>
+      <div class="stat-label">Con ajuste pendiente</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" style="color:var(--navy-light)">0</div>
+      <div class="stat-label">Videos grabados</div>
+    </div>
+  </div>
+
+  <h2>Plan de grabación</h2>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot">1</div>
+      <div class="tl-body">
+        <div class="tl-time">SESIÓN 1</div>
+        <div class="tl-title">Script 02 + Script 03</div>
+        <div class="tl-desc">Costo Hundido · Aversión a la Pérdida — sin bloqueadores, listos para grabar</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">2</div>
+      <div class="tl-body">
+        <div class="tl-time">SESIÓN 2</div>
+        <div class="tl-title">Script 04 + Script 05</div>
+        <div class="tl-desc">La Zorra y las Uvas · El Costo de Elegir — ajuste de remate en S04 antes de grabar</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">3</div>
+      <div class="tl-body">
+        <div class="tl-time">SESIÓN 3</div>
+        <div class="tl-title">Script 06 + Script 08</div>
+        <div class="tl-desc">El Conde / Séneca · El Tiempo Solo No Cura</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">4</div>
+      <div class="tl-body">
+        <div class="tl-time">SESIÓN 4</div>
+        <div class="tl-title">Script 10 + Script 12</div>
+        <div class="tl-desc">Intención y Juicio · Juan 15 / Aristóteles</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">5</div>
+      <div class="tl-body">
+        <div class="tl-time">SESIÓN 5</div>
+        <div class="tl-title">Script 07 + Script 09</div>
+        <div class="tl-desc">El Hombre de Hojalata · El Poema — confirmar aprobación S09 antes</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">6</div>
+      <div class="tl-body">
+        <div class="tl-time">SESIÓN 6</div>
+        <div class="tl-title">Script 11 + Script 01</div>
+        <div class="tl-desc">El Perdón (confirmar versión) · Utilidad Marginal (resolver footage Community)</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="alert alert-warn">
+    <strong>3 puntos a confirmar antes de fijar el orden de grabación:</strong><br>
+    1. Script 09 — ¿estado real: aprobado o en revisión?<br>
+    2. Script 11 — ¿versión de Drive es el borrador final?<br>
+    3. Script 01 — decidir Opción A / B / C para el bloqueador de footage Community
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<div id="scripts" class="section">
+  <h1>Los 12 Scripts</h1>
+  <p class="subtitle">Estado completo · Revisión de plataforma incluida</p>
+
+  <div class="card-grid" id="scripts-grid"></div>
+</div>
+
+<!-- IDEAS -->
+<div id="ideas" class="section">
+  <h1>Banco de Ideas</h1>
+  <p class="subtitle">6 ideas pre-evaluadas · Claude genera más cuando el banco baje de 5</p>
+
+  <div class="alert alert-info">
+    Cada idea llega con los 7 criterios evaluados. Tú solo decides: <strong>SÍ / NO / DESPUÉS</strong>. Las ideas marcadas SÍ pasan automáticamente al pipeline de script.
+  </div>
+
+  <div id="ideas-list"></div>
+</div>
+
+<!-- PIPELINE -->
+<div id="pipeline" class="section">
+  <h1>Pipeline de Producción</h1>
+  <p class="subtitle">Flujo completo de inicio a publicación</p>
+
+  <div class="pipeline">
+    <div class="pipe-step active" onclick="showPipe(0)">
+      <div class="pipe-step-num">1</div>
+      <div class="pipe-step-label">Idea</div>
+    </div>
+    <div class="pipe-step" onclick="showPipe(1)">
+      <div class="pipe-step-num">2</div>
+      <div class="pipe-step-label">Script</div>
+    </div>
+    <div class="pipe-step" onclick="showPipe(2)">
+      <div class="pipe-step-num">3</div>
+      <div class="pipe-step-label">Pre-prod</div>
+    </div>
+    <div class="pipe-step" onclick="showPipe(3)">
+      <div class="pipe-step-num">4</div>
+      <div class="pipe-step-label">Edición</div>
+    </div>
+    <div class="pipe-step" onclick="showPipe(4)">
+      <div class="pipe-step-num">5</div>
+      <div class="pipe-step-label">Publicación</div>
+    </div>
+  </div>
+
+  <div class="pipe-content active" id="pipe-0">
+    <div class="card">
+      <h3>Evaluación de idea nueva</h3>
+      <p style="color:#aaa;font-size:13px;margin-bottom:16px">Antes de desarrollar cualquier idea, pasa por estos 7 criterios.</p>
+      <ul class="checklist">
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>¿Tiene una entrada que nadie anticipa?</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>¿La tensión entre las dos partes produce algo que ninguna contenía sola?</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>¿El remate puede quedarse abierto sin que el video se sienta incompleto?</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>¿No se solapa con ningún script aprobado en su incomodidad final?</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>¿El primer frame puede detener el scroll?</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>¿El mecanismo es visible sin nombrarlo?</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>¿La incomodidad que produce toca algo que el espectador vive hoy?</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pipe-content" id="pipe-1">
+    <div class="card">
+      <h3>Escritura del script</h3>
+      <p style="color:#aaa;font-size:13px;margin-bottom:16px">Estructura de 4 momentos · Prueba de 6 puntos antes de aprobar</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div style="background:#111;border-radius:8px;padding:14px">
+          <div style="font-size:11px;color:var(--navy-light);font-weight:600;letter-spacing:.08em;margin-bottom:6px">0–3s</div>
+          <div style="font-weight:600;margin-bottom:4px">Interrupción</div>
+          <div style="font-size:12px;color:#888">Detiene el scroll. No anuncia el giro.</div>
+        </div>
+        <div style="background:#111;border-radius:8px;padding:14px">
+          <div style="font-size:11px;color:var(--navy-light);font-weight:600;letter-spacing:.08em;margin-bottom:6px">3–40s</div>
+          <div style="font-weight:600;margin-bottom:4px">Historia mínima</div>
+          <div style="font-size:12px;color:#888">Tensión sostenida. Sin destino visible.</div>
+        </div>
+        <div style="background:#111;border-radius:8px;padding:14px">
+          <div style="font-size:11px;color:var(--navy-light);font-weight:600;letter-spacing:.08em;margin-bottom:6px">40–70s</div>
+          <div style="font-weight:600;margin-bottom:4px">Giro</div>
+          <div style="font-size:12px;color:#888">El concepto emerge como consecuencia.</div>
+        </div>
+        <div style="background:#111;border-radius:8px;padding:14px">
+          <div style="font-size:11px;color:var(--navy-light);font-weight:600;letter-spacing:.08em;margin-bottom:6px">70–90s</div>
+          <div style="font-weight:600;margin-bottom:4px">Remate</div>
+          <div style="font-size:12px;color:#888">La tensión se devuelve sin resolverla.</div>
+        </div>
+      </div>
+      <h3 style="margin-bottom:10px">Prueba rápida (6 puntos)</h3>
+      <ul class="checklist">
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>¿La entrada anuncia hacia dónde va? → Si sí, reescribir</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>¿La frase más fuerte necesita contexto? → Si sí, no es la frase más fuerte</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>¿El concepto ilumina o justifica? → Si justifica, eliminarlo</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>¿El remate resuelve algo? → Si sí, cortar la última línea</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>¿Cristóbal está dentro del problema antes de señalarlo?</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>¿Alguna línea contradice el libre albedrío o la dignidad de la persona?</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pipe-content" id="pipe-2">
+    <div class="card">
+      <h3>Checklist antes de grabar</h3>
+      <p style="color:#aaa;font-size:13px;margin-bottom:16px">iPhone 16e · Micrófono inalámbrico · Trípode · Lenovo IdeaGaming 3</p>
+      <ul class="checklist">
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>iPhone 16e — batería &gt;80%</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>Micrófono inalámbrico — cargado y conectado</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>Trípode estable, ojos en el tercio superior del frame</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>1080p / 60fps activado · Formato vertical 9:16</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>Fondo oscuro o neutro (coherente con paleta #000 / #2a2a2a)</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>Fuente de luz frontal o en 45° — sin ventana directa atrás</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>Test de audio: 5 segundos de prueba, revisar en auriculares</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>Notificaciones del teléfono en silencio</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>Mínimo 3 takes completos por script</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pipe-content" id="pipe-3">
+    <div class="card">
+      <h3>Motor de edición</h3>
+      <p style="color:#aaa;font-size:13px;margin-bottom:16px">Sube el script + el video raw → Claude analiza, edita y entrega el video final</p>
+      <div class="alert alert-info" style="margin-bottom:16px">
+        <strong>Cómo funciona:</strong> Me subes el script aprobado y el video raw (archivo o link de Drive). Yo analizo los takes, identifico los mejores con timecodes, corto silencios y errores, compongo texto en pantalla, subtítulos y música, y entrego el video editado listo para subir.
+      </div>
+      <h3 style="margin-bottom:10px">Especificaciones de identidad visual</h3>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">
+        <div style="background:#000;border:1px solid #333;border-radius:6px;padding:10px;text-align:center">
+          <div style="width:24px;height:24px;background:#000;border:1px solid #555;border-radius:4px;margin:0 auto 6px"></div>
+          <div style="font-size:10px;color:#888">#000000<br>Negro</div>
+        </div>
+        <div style="background:#2a2a2a;border:1px solid #333;border-radius:6px;padding:10px;text-align:center">
+          <div style="width:24px;height:24px;background:#2a2a2a;border:1px solid #555;border-radius:4px;margin:0 auto 6px"></div>
+          <div style="font-size:10px;color:#888">#2a2a2a<br>Carbón</div>
+        </div>
+        <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:10px;text-align:center">
+          <div style="width:24px;height:24px;background:#f5f5f5;border-radius:4px;margin:0 auto 6px"></div>
+          <div style="font-size:10px;color:#888">#f5f5f5<br>Blanco roto</div>
+        </div>
+        <div style="background:#1a3a52;border:1px solid #254d6e;border-radius:6px;padding:10px;text-align:center">
+          <div style="width:24px;height:24px;background:#1a3a52;border-radius:4px;margin:0 auto 6px"></div>
+          <div style="font-size:10px;color:#aaa">#1a3a52<br>Navy</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px">
+        <div style="flex:1;background:#111;border-radius:8px;padding:12px">
+          <div style="font-size:11px;color:#888;margin-bottom:4px">TÍTULO</div>
+          <div style="font-family:'Playfair Display',serif;font-size:16px">Playfair Display</div>
+        </div>
+        <div style="flex:1;background:#111;border-radius:8px;padding:12px">
+          <div style="font-size:11px;color:#888;margin-bottom:4px">CUERPO</div>
+          <div style="font-family:'Inter',sans-serif;font-size:15px;font-weight:400">Inter Regular</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pipe-content" id="pipe-4">
+    <div class="card">
+      <h3>Publicación</h3>
+      <p style="color:#aaa;font-size:13px;margin-bottom:16px">Claude genera caption y hashtags · Cristóbal ajusta y publica</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div style="background:#111;border-radius:8px;padding:14px">
+          <div style="font-size:11px;color:var(--navy-light);font-weight:600;letter-spacing:.08em;margin-bottom:8px">TIKTOK</div>
+          <div style="font-size:13px;color:#aaa">19:00–21:00 hora local<br>Martes · Miércoles · Viernes</div>
+        </div>
+        <div style="background:#111;border-radius:8px;padding:14px">
+          <div style="font-size:11px;color:var(--navy-light);font-weight:600;letter-spacing:.08em;margin-bottom:8px">INSTAGRAM</div>
+          <div style="font-size:13px;color:#aaa">18:00–20:00 hora local<br>Martes · Miércoles · Viernes</div>
+        </div>
+      </div>
+      <h3 style="margin-bottom:10px">Señales de engagement a leer (24h/72h)</h3>
+      <ul class="checklist">
+        <li><div class="check-icon done">✓</div>Comentarios que citan una frase específica → esa frase resonó</li>
+        <li><div class="check-icon done">✓</div>"No entendí pero me quedé" → el misterio funciona</li>
+        <li><div class="check-icon done">✓</div>"Esto me pasó" → el reconocimiento funcionó</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>Completion rate &lt;30% → revisar ritmo de los primeros 15s</li>
+        <li><div class="check-icon" onclick="toggleCheck(this)"></div>Completion rate &gt;60% → replicar el ritmo en próximos videos</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- REDES -->
+<div id="redes" class="section">
+  <h1>Revisión de Plataforma</h1>
+  <p class="subtitle">Segunda lectura de experto para los 12 scripts · Completion rate estimado · Ajustes recomendados</p>
+  <div id="redes-list"></div>
+</div>
+
+</main>
+
+<script>
+// DATA
+const scripts = [
+  { num:'01', title:'Utilidad Marginal Decreciente', sub:'Community + Gossen', formato:'Conexión Improbable', estado:'aprobado', bloqueador:'Footage Community', sesion:6, cr:[45,55], decision:'warn', ajuste:'El hook no puede depender de que conozcan Community. Abrir con la galleta o con una frase que no requiera el contexto de la serie.', audio:'Ambient minimalista frío. Sin melodía dominante, sin letra.', quote:'La galleta es la misma. Troy no.' },
+  { num:'02', title:'Falacia del Costo Hundido', sub:'Thaler + Kahneman', formato:'Sin formato rígido', estado:'listo', bloqueador:null, sesion:1, cr:[55,65], decision:'ok', ajuste:'Opcional: poner "seguir." como texto en pantalla en los primeros 3s para anclar el hook visualmente.', audio:'Ambient frío. Silencio después del remate — la música no debe llenarlo.', quote:'El pasado es punto de referencia, no de residencia.' },
+  { num:'03', title:'Aversión a la Pérdida', sub:'Kahneman + Tversky · Prospect Theory', formato:'Sin formato rígido', estado:'listo', bloqueador:null, sesion:1, cr:[50,60], decision:'ok', ajuste:'Pausa completa entre "La pregunta no es si duele soltar." y la línea siguiente. El silencio es parte del remate.', audio:'Ambient frío. El remate necesita silencio real.', quote:'La pregunta no es si duele soltar. Es si te puedes permitir no hacerlo.' },
+  { num:'04', title:'La Zorra y las Uvas', sub:'Esopo + Festinger · Disonancia cognitiva', formato:'Historia', estado:'listo', bloqueador:null, sesion:2, cr:[60,70], decision:'warn', ajuste:'Terminar en "Las necesitaba amargas para poder irse." — cortar todo lo que sigue. La segunda mitad del remate actual resuelve la tensión.', audio:'Piano solo o cuerdas suaves. Levemente más cálida que los otros.', quote:'Las uvas no estaban amargas. Las necesitaba amargas para poder irse.' },
+  { num:'05', title:'El Costo de Elegir', sub:'Barry Schwartz + Kierkegaard', formato:'Conexión Improbable', estado:'listo', bloqueador:null, sesion:2, cr:[50,60], decision:'warn', ajuste:'Elegir entre la etimología de decidir y Kierkegaard — uno de los dos sobra en 60–90s. Quitar "posiblemente" del remate.', audio:'Ambient neutral-filosófico. Temperatura media.', quote:'Comprometerse con algo no es perder el resto. Es convertirse en alguien.' },
+  { num:'06', title:'El Conde / Séneca', sub:'Larraín + Séneca + amígdala', formato:'Sin formato rígido', estado:'listo', bloqueador:null, sesion:3, cr:[65,75], decision:'ok', ajuste:'Opcional: presentar la cita de El Conde antes de revelar el origen para no depender del reconocimiento de la película.', audio:'Ambient muy frío, casi silencio. La música casi imperceptible.', quote:'Eres el arquitecto más eficaz de tu propio sufrimiento.' },
+  { num:'07', title:'El Hombre de Hojalata', sub:'El Mago de Oz + William James', formato:'Sin formato rígido', estado:'revision', bloqueador:'Revisión de producción pendiente', sesion:5, cr:[45,55], decision:'warn', ajuste:'"Yo puedo decírtelo. Sí tienes corazón." rompe la voz del canal — es la única línea donde Cristóbal habla desde autoridad externa. Terminar en "Le faltaba una despedida."', audio:'Cuerdas suaves, levemente cálida. El Mago de Oz tiene nostalgia.', quote:'No le faltaba lo que pedía. Le faltaba una despedida.' },
+  { num:'08', title:'El Tiempo Solo No Cura', sub:'Heráclito + metáfora del estanque', formato:'Sin formato rígido', estado:'listo', bloqueador:null, sesion:3, cr:[60,70], decision:'ok', ajuste:'Ajuste menor: ser más concreto en "la investigación sobre el dolor" — actualmente la fuente es demasiado vaga para el nivel de rigor del canal.', audio:'Ambient neutral. Ni muy melancólica ni muy fría.', quote:'Calmar no es lo mismo que curar.' },
+  { num:'09', title:'El No Amor Como Fuente Para Crear', sub:'Poema propio — Formato Válvula', formato:'Válvula', estado:'confirmar', bloqueador:'Confirmar aprobación final', sesion:5, cr:[70,80], decision:'warn', ajuste:'Listo para grabar pero publicar como video 8–10. El formato válvula necesita audiencia establecida. Publicar antes del video 6 produce bajo engagement por falta de contexto.', audio:'Silencio o ambient casi imperceptible. El poema necesita el silencio del espectador.', quote:'Sin metáforas: no te amo.' },
+  { num:'10', title:'Intención, Acción y Juicio', sub:'Adam Smith — teoría moral', formato:'Sin formato rígido', estado:'listo', bloqueador:null, sesion:4, cr:[55,65], decision:'warn', ajuste:'Eliminar "rebalanceo" — suena a autoayuda, rompe el registro del canal. Evaluar si el remate cierra demasiado o si terminar antes es más efectivo.', audio:'Ambient neutral-frío. El script es más cognitivo que emocional.', quote:'A los demás los juzgamos por sus acciones. A nosotros, por nuestras intenciones.' },
+  { num:'11', title:'El Perdón', sub:'Derrida + Jesús en la cruz', formato:'Sin formato rígido', estado:'confirmar', bloqueador:'Confirmar versión vigente en Drive', sesion:6, cr:[50,60], decision:'ok', ajuste:'Pausa larga antes de entrar a Derrida. Silencio de audio completo en la cita de Jesús — el track debe cortarse antes de esa línea y no volver.', audio:'Silencio real en la cita de Jesús. Es el único script donde el silencio absoluto es la decisión correcta.', quote:'Lo que sigue es preguntarnos qué implica que alguien haya podido hacer eso.' },
+  { num:'12', title:'Juan 15 / Aristóteles', sub:'Evangelio Juan 15 + Ética a Nicómaco', formato:'Sin formato rígido', estado:'listo', bloqueador:null, sesion:4, cr:[55,65], decision:'ok', ajuste:'No publicar junto al Script 01 — "por última vez" resuena con "la primera vez no se repite". Separar al menos 2–3 videos entre ellos.', audio:'Cuerdas suaves, cálidas pero no sentimentales. Silencio en la apertura en negro.', quote:'Es la misma decisión, tomada una vez, que se repite cada día.' },
+];
+
+const ideas = [
+  { letra:'A', title:'El Panóptico', sub:'Bentham (1787) + redes sociales hoy', desc:'No necesitas que alguien te vigile — basta con que puedas ser visto para que te comportes como si siempre lo fueras. El panóptico es la arquitectura del autocontrol involuntario.', hook:'"La cámara no necesita estar encendida."', incomodidad:'El vigilante más eficaz ya vive dentro de ti.', formato:'Conexión Improbable', solapamiento:'Ninguno ✓', plataforma:'Alto — el tema de vigilancia en redes tiene tracción orgánica constante', decision:'pendiente', tags:['Bentham','Vigilancia','Redes sociales','Autocontrol'] },
+  { letra:'B', title:'Sapir-Whorf', sub:'Lingüística + percepción del color en ruso', desc:'El idioma que hablas construye lo que puedes percibir. El ruso tiene dos palabras para azul y sus hablantes distinguen el color más rápido. No es que no tengas palabras — es que no tienes el concepto.', hook:'Una emoción que sientes pero no puedes nombrar.', incomodidad:'Hay cosas que no puedes sentir completamente porque tu idioma nunca te enseñó a verlas.', formato:'Historia / Conexión Improbable', solapamiento:'Ninguno ✓', plataforma:'Alto — la demo del azul ruso es visualmente impactante y muy compartible', decision:'pendiente', tags:['Lingüística','Percepción','Lenguaje','Cognición'] },
+  { letra:'C', title:'Frans de Waal / Capuchinos', sub:'Experimento de inequidad (2003)', desc:'Los capuchinos rechazan el pepino cuando el otro mono recibe uva. La inequidad no es un invento moderno. No elegiste compararte. Ya venías así.', hook:'El mono tira el pepino con furia. Lleva millones de años haciendo eso.', incomodidad:'El instinto de comparación no es debilidad — pero tampoco tiene por qué gobernar.', formato:'Historia', solapamiento:'⚠️ Verificar con Script 03 (mecanismos distintos pero revisar destino emocional)', plataforma:'Alto — el video del experimento es viral y reconocible', decision:'pendiente', tags:['Frans de Waal','Inequidad','Evolución','Comparación'] },
+  { letra:'D', title:'Dunning-Kruger', sub:'Dunning & Kruger (1999)', desc:'El pico de la confianza llega exactamente donde termina la comprensión real. El momento en que alguien deja de preguntar porque cree que ya sabe.', hook:'"Hay un momento en que dejas de hacer preguntas. No porque las tengas todas respondidas."', incomodidad:'La ignorancia que no duele es la más cara.', formato:'Sin formato rígido', solapamiento:'Ninguno ✓', plataforma:'Medio — concepto muy conocido, el riesgo es caer en la versión genérica. La entrada debe descolocar.', decision:'pendiente', tags:['Dunning-Kruger','Metacognición','Ignorancia','Confianza'] },
+  { letra:'E', title:'Regla del 37%', sub:'Problema del secretario — matemática de decisiones', desc:'El momento óptimo para elegir es después de haber rechazado el 37% de las opciones. Antes de eso, no tienes criterio. Después, perdiste tus mejores opciones.', hook:'"¿Cuándo sabes que ya encontraste lo suficientemente bueno?"', incomodidad:'Hay una tensión irresolvible entre criterio y oportunidad — y la matemática no la resuelve, solo la nombra.', formato:'Conexión Improbable', solapamiento:'⚠️ Verificar con Script 05 (parálisis por opciones vs. cuándo comprometerse — distintos pero revisar)', plataforma:'Alto — el número concreto (37%) es un hook natural', decision:'pendiente', tags:['Matemáticas','Decisiones','Óptimo','Compromiso'] },
+  { letra:'F', title:'Zurita / Diogo Jota', sub:'Válvula — "despedirse para quedarse"', desc:'La cita de Zurita ("Toda declaración de amor es urgente porque vamos a morir") + Diogo Jota como segundo elemento concreto. Dos certezas innegables que deberían producir una conclusión — y no la producen.', hook:'Apertura aprobada, desarrollo en refinamiento.', incomodidad:'Pendiente de definir.', formato:'Válvula', solapamiento:'⚠️ Verificar con "intentar amar como quien se despide para quedarse"', plataforma:'Medio — el formato válvula necesita audiencia previa', decision:'desarrollo', tags:['Zurita','Diogo Jota','Amor','Muerte','Válvula'] },
+];
+
+const redesData = [
+  { num:'01', title:'Utilidad Marginal', cr:'45–55%', decision:'warn', fortaleza:'"La galleta es la misma. Troy no." es la mejor frase de los 12 scripts para retención. El mecanismo (repetir lo bueno lo destruye) es universal — aplica a relaciones, música, series.', riesgo:'La apertura depende de que el espectador conozca Community. En TikTok LATAM, el reconocimiento es moderado. Si el hook de 0–3s depende de Troy sin contexto visual, el abandono es alto.', ajuste:'Abrir con la galleta (visual o narración) antes de mencionar a Troy. Alternativa: "Hay cosas que la primera vez son perfectas. Y después nunca vuelven a serlo."', audio:'Ambient minimalista frío. Sin melodía, sin letra.' },
+  { num:'02', title:'Costo Hundido', cr:'55–65%', decision:'ok', fortaleza:'"Hay algo que los humanos hacemos con una consistencia casi admirable: seguir." — activa reconocimiento inmediato. Los tres ejemplos en cascada (relación, carrera, película) generan retención progresiva.', riesgo:'"Por contabilidad" puede perder al espectador casual en el segundo 10 si no entiende el giro inmediatamente.', ajuste:'Ninguno estructural. Opcional: texto en pantalla con solo "seguir." para anclar el hook visualmente.', audio:'Ambient frío. Silencio después del remate.' },
+  { num:'03', title:'Aversión a la Pérdida', cr:'50–60%', decision:'ok', fortaleza:'El ejercicio mental de apertura (imagina que te dan / te quitan 100K) activa al espectador en los primeros 5 segundos — hace algo, no solo escucha. Reduce abandono en los primeros 10s.', riesgo:'Mayor densidad conceptual del batch. En TikTok, la densidad alta correlaciona con re-watches (positivo) pero también con abandono si el ritmo decae.', ajuste:'En la grabación: pausa completa entre las dos líneas del remate. El silencio de 1–2 segundos es parte del video.', audio:'Ambient frío. El remate necesita silencio real.' },
+  { num:'04', title:'Zorra y Uvas', cr:'60–70%', decision:'warn', fortaleza:'La apertura es la más disruptiva del batch: coloquial, directa, incómoda. El registro inesperado para un canal filosófico produce alta retención en los primeros 3s.', riesgo:'La segunda mitad del remate resuelve la tensión en lugar de devolverla. "El dolor de no alcanzar algo real es más sano" se acerca a moralización — lo que el canal nunca hace.', ajuste:'Terminar en "Las necesitaba amargas para poder irse." — todo lo que sigue es explicación innecesaria que el espectador ya procesó.', audio:'Piano solo o cuerdas suaves. Nostalgia leve.' },
+  { num:'05', title:'El Costo de Elegir', cr:'50–60%', decision:'warn', fortaleza:'El experimento de las mermeladas (30% vs. 3%) tiene credibilidad inmediata. La conexión con Kierkegaard es el diferenciador del canal. El tema es endémico de la generación que usa TikTok.', riesgo:'Dos conceptos pesados compitiendo: paradoja de la elección + etimología + Kierkegaard + identidad. Demasiado para 60–90s.', ajuste:'Elegir entre etimología y Kierkegaard. Quitar "posiblemente" del remate — debilita una observación que ya está bien construida.', audio:'Ambient neutral-filosófico. Temperatura media.' },
+  { num:'06', title:'El Conde / Séneca', cr:'65–75%', decision:'ok', fortaleza:'"Tu pareja te dice tenemos que hablar" — el hook más inmediato del batch. La estructura de tres fuentes convergentes (dictador / estoico / escáner) es narrativa y fácil de seguir.', riesgo:'El Conde de Larraín es referencia de nicho. El contexto histórico (Pinochet) puede generar confusión en audiencias que no conocen la película.', ajuste:'Opcional: cita primero, origen después. La cita se sostiene sin el contexto completo de la película.', audio:'Ambient muy frío, casi silencio.' },
+  { num:'07', title:'Hombre de Hojalata', cr:'45–55%', decision:'warn', fortaleza:'La cita de apertura es fuerte — cargada, sola. El Mago de Oz es reconocimiento universal. El mecanismo (notas lo que se interrumpe) es original en plataforma.', riesgo:'"Yo puedo decírtelo. Sí tienes corazón." — única línea en los 12 scripts donde Cristóbal habla desde autoridad externa. Rompe la voz del canal.', ajuste:'Terminar en "No le faltaba lo que pedía. Le faltaba una despedida." — el espectador conecta el resto sin que se lo digan.', audio:'Cuerdas suaves. Nostalgia leve.' },
+  { num:'08', title:'El Tiempo No Cura', cr:'60–70%', decision:'ok', fortaleza:'Subvertir el lugar común ("El tiempo lo cura todo") activa defensiva del espectador. La metáfora río vs. estanque es visual y memorable. "Calmar no es lo mismo que curar" es la frase más compartible del batch.', riesgo:'"La investigación sobre cómo procesamos el dolor" sin atribución específica baja la credibilidad percibida. El canal tiene rigor factual — aquí la fuente es vaga.', ajuste:'Ajuste menor: "Hay estudios sobre duelo que llegan a lo mismo: no es el tiempo — es lo que haces mientras pasa."', audio:'Ambient neutral. No demasiado melancólica.' },
+  { num:'09', title:'El No Amor', cr:'70–80%*', decision:'warn', fortaleza:'El formato es inesperado — nadie en plataforma combina poesía propia + reflexión fría. "Sin metáforas: no te amo." es el mejor remate de poema del batch para plataforma.', riesgo:'El formato válvula depende de que el espectador ya tenga relación con la voz. Publicar en los primeros 5 videos produce engagement bajo por falta de contexto.', ajuste:'Retrasar publicación. No publicar antes del video 8. El *70–80% aplica cuando ya hay audiencia establecida.', audio:'Silencio o ambient casi imperceptible.' },
+  { num:'10', title:'Intención y Juicio', cr:'55–65%', decision:'warn', fortaleza:'"Si ellos se equivocan, son malas personas. Si nosotros nos equivocamos, estamos en un mal momento." — activa reconocimiento incómodo inmediato.', riesgo:'"Rebalanceo" es jerga de autoayuda que rompe el registro. El remate con "darnos" y "darle" son imperativos suaves que se acercan a instrucción.', ajuste:'Eliminar "rebalanceo". Evaluar si terminar antes del remate actual es más efectivo para la voz del canal.', audio:'Ambient neutral-frío.' },
+  { num:'11', title:'El Perdón', cr:'50–60%', decision:'ok', fortaleza:'Subvierte el discurso de autoayuda desde la primera línea. La arquitectura (ciencia → Derrida → Jesús) es el movimiento editorial más ambicioso del canal. La polarización en comentarios es señal positiva para el algoritmo.', riesgo:'Cuatro movimientos en ~50 segundos. En TikTok, densidad alta en el giro produce abandono en el tercero.', ajuste:'Pausa larga antes de Derrida. Silencio de audio completo en la cita de Jesús — el track debe cortarse y no volver.', audio:'Silencio absoluto en la cita de Jesús. Es el único script donde esto es la decisión correcta.' },
+  { num:'12', title:'Juan 15 / Aristóteles', cr:'55–65%', decision:'ok', fortaleza:'Pantalla en negro con texto sin atribución — decisión editorial más inteligente del batch. "Leíste vida. Pero pensaste en muerte." captura lo que el espectador hace en tiempo real.', riesgo:'El giro es el más largo del batch (35–65s). Tres capas sin ejemplo cotidiano — la carga va toda sobre el argumento teológico.', ajuste:'El giro necesita ser el momento más lento del video. No publicar junto al Script 01 (eco fonético "última vez" / "primera vez").', audio:'Cuerdas suaves. Silencio en la apertura en negro.' },
+];
+
+// RENDER SCRIPTS
+function renderScripts() {
+  const grid = document.getElementById('scripts-grid');
+  scripts.forEach(s => {
+    const estadoBadge = s.estado === 'listo' ? '<span class="badge badge-ok">✓ Listo</span>'
+      : s.estado === 'aprobado' ? '<span class="badge badge-ok">✓ Aprobado</span>'
+      : s.estado === 'revision' ? '<span class="badge badge-warn">⚠ Revisión prod.</span>'
+      : '<span class="badge badge-dev">⬜ Confirmar</span>';
+    const crAvg = (s.cr[0] + s.cr[1]) / 2;
+    const crClass = crAvg >= 60 ? 'high' : crAvg >= 50 ? 'mid' : 'low';
+    const adjBadge = s.decision === 'ok'
+      ? '<span class="badge badge-ok">✓ Lista para plataforma</span>'
+      : '<span class="badge badge-warn">⚠ Ajuste recomendado</span>';
+    grid.innerHTML += `
+      <div class="card">
+        <div class="script-number">SCRIPT ${s.num} · SESIÓN ${s.sesion}</div>
+        <div class="script-title">${s.title}</div>
+        <div class="script-sub">${s.sub} · ${s.formato}</div>
+        <div class="script-meta">
+          ${estadoBadge}
+          ${s.bloqueador ? `<span class="badge badge-block">⚠ ${s.bloqueador}</span>` : ''}
+        </div>
+        <div class="completion-wrap">
+          <div class="completion-label"><span>Completion rate estimado</span><span>${s.cr[0]}–${s.cr[1]}%</span></div>
+          <div class="completion-bar"><div class="completion-fill ${crClass}" style="width:${crAvg}%"></div></div>
+        </div>
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid #1a1a1a">
+          ${adjBadge}
+          ${s.decision !== 'ok' ? `<p style="font-size:12px;color:#888;margin-top:8px">${s.ajuste}</p>` : ''}
+        </div>
+        <div style="margin-top:12px;font-family:'Playfair Display',serif;font-size:13px;color:#666;font-style:italic;border-left:2px solid #1a3a52;padding-left:10px">"${s.quote}"</div>
+      </div>`;
+  });
+}
+
+// RENDER IDEAS
+function renderIdeas() {
+  const list = document.getElementById('ideas-list');
+  ideas.forEach(idea => {
+    const decBadge = idea.decision === 'pendiente'
+      ? '<span class="badge badge-warn">⬜ Pendiente decisión</span>'
+      : '<span class="badge badge-dev">🔄 En desarrollo</span>';
+    list.innerHTML += `
+      <div class="card" style="margin-bottom:20px">
+        <div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:12px">
+          <div style="font-family:'Playfair Display',serif;font-size:40px;font-weight:700;color:#1a3a52;line-height:1;flex-shrink:0">${idea.letra}</div>
+          <div style="flex:1">
+            <div style="font-size:17px;font-weight:600;margin-bottom:2px">${idea.title}</div>
+            <div style="font-size:12px;color:#888;margin-bottom:8px">${idea.sub}</div>
+            ${decBadge}
+          </div>
+        </div>
+        <p style="font-size:13px;color:#aaa;margin-bottom:10px;line-height:1.7">${idea.desc}</p>
+        <div style="font-style:italic;color:#888;font-size:13px;border-left:2px solid #333;padding-left:10px;margin-bottom:12px">"${idea.hook}"</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+          <div style="background:#111;border-radius:6px;padding:10px">
+            <div style="font-size:10px;color:#666;margin-bottom:3px">INCOMODIDAD FINAL</div>
+            <div style="font-size:12px;color:#ccc">${idea.incomodidad}</div>
+          </div>
+          <div style="background:#111;border-radius:6px;padding:10px">
+            <div style="font-size:10px;color:#666;margin-bottom:3px">POTENCIAL DE PLATAFORMA</div>
+            <div style="font-size:12px;color:#ccc">${idea.plataforma}</div>
+          </div>
+        </div>
+        ${idea.solapamiento.includes('⚠️') ? `<div class="alert alert-warn" style="margin-bottom:12px">${idea.solapamiento}</div>` : `<div class="alert alert-ok" style="margin-bottom:12px">Solapamiento: ${idea.solapamiento}</div>`}
+        <div style="display:flex;gap:6px;flex-wrap:wrap">${idea.tags.map(t=>`<span class="idea-tag">${t}</span>`).join('')}</div>
+      </div>`;
+  });
+}
+
+// RENDER REDES
+function renderRedes() {
+  const list = document.getElementById('redes-list');
+  redesData.forEach(r => {
+    const crAvg = parseInt(r.cr.split('–')[0]) + 5;
+    const crClass = crAvg >= 60 ? 'high' : crAvg >= 50 ? 'mid' : 'low';
+    const decBadge = r.decision === 'ok'
+      ? '<span class="badge badge-ok">✓ Lista para plataforma</span>'
+      : '<span class="badge badge-warn">⚠ Ajuste recomendado</span>';
+    list.innerHTML += `
+      <div class="card" style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div>
+            <span style="font-size:11px;color:var(--navy-light);font-weight:600;letter-spacing:.1em">SCRIPT ${r.num}</span>
+            <h3 style="margin:2px 0 0">${r.title}</h3>
+          </div>
+          ${decBadge}
+        </div>
+        <div class="completion-wrap" style="margin-bottom:16px">
+          <div class="completion-label"><span>Completion rate estimado</span><span>${r.cr}</span></div>
+          <div class="completion-bar"><div class="completion-fill ${crClass}" style="width:${crAvg}%"></div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div>
+            <div style="font-size:10px;color:#4ade80;font-weight:600;letter-spacing:.08em;margin-bottom:6px">FORTALEZA</div>
+            <p style="font-size:12px;color:#aaa;line-height:1.6">${r.fortaleza}</p>
+          </div>
+          <div>
+            <div style="font-size:10px;color:#f87171;font-weight:600;letter-spacing:.08em;margin-bottom:6px">RIESGO</div>
+            <p style="font-size:12px;color:#aaa;line-height:1.6">${r.riesgo}</p>
+          </div>
+        </div>
+        ${r.ajuste ? `<div class="alert alert-warn" style="margin-bottom:8px"><strong>Ajuste:</strong> ${r.ajuste}</div>` : ''}
+        <div style="font-size:12px;color:#888"><strong style="color:#666">Audio:</strong> ${r.audio}</div>
+      </div>`;
+  });
+}
+
+// NAV
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// PIPELINE
+function showPipe(idx) {
+  document.querySelectorAll('.pipe-step').forEach((s,i) => s.classList.toggle('active', i===idx));
+  document.querySelectorAll('.pipe-content').forEach((c,i) => c.classList.toggle('active', i===idx));
+}
+
+// CHECKLIST
+function toggleCheck(el) {
+  el.classList.toggle('done');
+  el.textContent = el.classList.contains('done') ? '✓' : '';
+}
+
+// INIT
+renderScripts();
+renderIdeas();
+renderRedes();
+</script>
+</body>
+</html>
