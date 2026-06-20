@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>@cristobaldiazp — Plataforma de Contenido</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#000;--surface:#0d0d0d;--card:#141414;--border:#1f1f1f;--border2:#2a2a2a;
+  --text:#f5f5f5;--muted:#666;--muted2:#444;
+  --navy:#1a3a52;--navy2:#254d6e;--navy3:#0f2233;
+  --green:#22c55e;--green-bg:#0a1f10;--green-border:#166534;
+  --yellow:#f59e0b;--yellow-bg:#1c1200;--yellow-border:#92400e;
+  --red:#ef4444;--red-bg:#1f0a0a;--red-border:#991b1b;
+  --blue:#818cf8;--blue-bg:#0e0f1e;--blue-border:#3730a3;
+}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;min-height:100vh}
+#sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:50}
+.logo{padding:24px 20px 20px;border-bottom:1px solid var(--border)}
+.logo-text{font-family:'Playfair Display',serif;font-size:16px;font-weight:700}
+.logo-sub{font-size:11px;color:var(--muted);margin-top:2px}
+nav{flex:1;padding:12px 8px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-size:13px;font-weight:500;transition:all .15s;border:none;background:none;width:100%;text-align:left;margin-bottom:2px}
+.nav-item:hover{background:var(--card);color:var(--text)}
+.nav-item.active{background:var(--navy3);color:var(--text);border:1px solid var(--navy)}
+.nav-icon{font-size:15px;width:20px;text-align:center}
+.nav-section{font-size:10px;font-weight:600;color:var(--muted2);letter-spacing:.1em;text-transform:uppercase;padding:16px 12px 6px}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border)}
+.ai-btn{width:100%;padding:10px;background:var(--navy3);border:1px solid var(--navy);border-radius:8px;color:var(--text);font-size:12px;font-weight:600;cursor:pointer;text-align:center;transition:all .2s}
+.ai-btn:hover{background:var(--navy)}
+#main{margin-left:220px;min-height:100vh;padding:32px}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.page-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700}
+.page-sub{font-size:13px;color:var(--muted);margin-top:2px}
+.topbar-actions{display:flex;gap:8px}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.btn-primary{background:var(--navy);color:var(--text)}
+.btn-primary:hover{background:var(--navy2)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2)}
+.btn-ghost:hover{color:var(--text);border-color:var(--muted)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.view{display:none}
+.view.active{display:block}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px}
+.stat-num{font-family:'Playfair Display',serif;font-size:32px;font-weight:700}
+.stat-label{font-size:11px;color:var(--muted);margin-top:3px;font-weight:500}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:12px}
+.card:hover{border-color:var(--border2)}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.badge-yellow{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-border)}
+.badge-blue{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border)}
+.badge-navy{background:var(--navy3);color:#7db3d4;border:1px solid var(--navy)}
+.badge-red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.progress-wrap{margin-top:10px}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px}
+.progress-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;border-radius:2px}
+.fill-green{background:var(--green)}.fill-navy{background:var(--navy2)}.fill-red{background:var(--red)}
+.script-num{font-size:10px;color:var(--navy2);font-weight:700;letter-spacing:.12em;margin-bottom:4px}
+.script-title{font-size:15px;font-weight:600;margin-bottom:2px}
+.script-sub{font-size:12px;color:var(--muted);margin-bottom:10px}
+.script-quote{font-family:'Playfair Display',serif;font-size:12px;color:var(--muted);font-style:italic;border-left:2px solid var(--navy);padding-left:8px;margin-top:12px;line-height:1.5}
+.tabs{display:flex;gap:2px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:3px;margin-bottom:20px;width:fit-content}
+.tab{padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);border:none;background:none;transition:all .15s}
+.tab.active{background:var(--navy3);color:var(--text);border:1px solid var(--navy)}
+.pipeline-steps{display:flex;margin-bottom:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.pipe-step{flex:1;padding:14px 8px;text-align:center;cursor:pointer;border-right:1px solid var(--border);transition:all .15s}
+.pipe-step:last-child{border-right:none}
+.pipe-step.active{background:var(--navy3)}
+.pipe-step:hover:not(.active){background:var(--surface)}
+.pipe-num{width:24px;height:24px;border-radius:50%;background:var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin:0 auto 6px;transition:all .15s}
+.pipe-step.active .pipe-num{background:var(--navy);border:1px solid var(--navy2)}
+.pipe-label{font-size:11px;color:var(--muted);font-weight:500}
+.pipe-step.active .pipe-label{color:var(--text)}
+.pipe-content{display:none}
+.pipe-content.active{display:block}
+.checklist{list-style:none}
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.check-item:last-child{border-bottom:none}
+.check-box{width:18px;height:18px;border-radius:4px;border:2px solid var(--border2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-size:10px}
+.check-box.done{background:var(--navy);border-color:var(--navy2);color:#fff}
+.check-text{font-size:13px;line-height:1.5}
+.check-text.done{color:var(--muted);text-decoration:line-through}
+.timeline{position:relative;padding-left:48px}
+.timeline::before{content:'';position:absolute;left:16px;top:8px;bottom:8px;width:1px;background:var(--border)}
+.tl-item{position:relative;margin-bottom:24px}
+.tl-dot{position:absolute;left:-38px;top:4px;width:28px;height:28px;border-radius:50%;background:var(--navy3);border:1px solid var(--navy);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#7db3d4}
+.tl-time{font-size:10px;color:var(--navy2);font-weight:700;letter-spacing:.1em;margin-bottom:3px}
+.tl-title{font-size:14px;font-weight:600;margin-bottom:3px}
+.tl-desc{font-size:12px;color:var(--muted)}
+.alert{border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.5;margin-bottom:12px}
+.alert-yellow{background:var(--yellow-bg);border:1px solid var(--yellow-border);color:var(--yellow)}
+.alert-blue{background:var(--blue-bg);border:1px solid var(--blue-border);color:var(--blue)}
+.alert-green{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green)}
+.ai-box{background:var(--navy3);border:1px solid var(--navy);border-radius:10px;padding:16px;margin-top:16px}
+.ai-box-label{font-size:10px;font-weight:700;color:var(--navy2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.ai-box-text{font-size:12px;color:var(--muted);line-height:1.6;font-family:monospace;background:var(--surface);border-radius:6px;padding:10px;margin-bottom:10px;white-space:pre-wrap}
+.ai-box-btn{width:100%;padding:8px;background:var(--navy);border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer}
+.ai-box-btn:hover{background:var(--navy2)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border2);border-radius:12px;width:100%;max-width:520px;max-height:85vh;overflow-y:auto}
+.modal-header{padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:600}
+.modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer}
+.modal-body{padding:20px 24px 24px}
+.field{margin-bottom:14px}
+.label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;letter-spacing:.04em;text-transform:uppercase}
+.input,.textarea,.select{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none}
+.input:focus,.textarea:focus,.select:focus{border-color:var(--navy2)}
+.textarea{resize:vertical;min-height:70px;line-height:1.6}
+.tag{background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:2px 7px;font-size:11px;color:var(--muted);display:inline-block;margin:2px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 12px;font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+td{padding:11px 12px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+hr{border:none;border-top:1px solid var(--border);margin:20px 0}
+.section-label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="logo">
+    <div class="logo-text">@cristobaldiazp</div>
+    <div class="logo-sub">Plataforma de Producción</div>
+  </div>
+  <nav>
+    <div class="nav-section">Principal</div>
+    <button class="nav-item active" onclick="goTo('dashboard',this)"><span class="nav-icon">◈</span>Dashboard</button>
+    <button class="nav-item" onclick="goTo('scripts',this)"><span class="nav-icon">✦</span>Scripts</button>
+    <button class="nav-item" onclick="goTo('ideas',this)"><span class="nav-icon">◎</span>Ideas</button>
+    <div class="nav-section">Producción</div>
+    <button class="nav-item" onclick="goTo('pipeline',this)"><span class="nav-icon">⟶</span>Pipeline</button>
+    <button class="nav-item" onclick="goTo('publicacion',this)"><span class="nav-icon">↑</span>Publicación</button>
+    <button class="nav-item" onclick="goTo('metricas',this)"><span class="nav-icon">◌</span>Métricas</button>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="ai-btn" onclick="abrirClaude('general')">✦ Abrir con Claude</button>
+  </div>
+</aside>
+
+<main id="main">
+
+<!-- DASHBOARD -->
+<div id="v-dashboard" class="view active">
+  <div class="topbar">
+    <div><div class="page-title">Dashboard</div><div class="page-sub">Junio 2026 · Batch 1 en preparación</div></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-num">12</div><div class="stat-label">Scripts totales</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--green)" id="s-listos"></div><div class="stat-label">Listos para grabar</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--yellow)" id="s-ajuste"></div><div class="stat-label">Con ajuste pendiente</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--navy2)" id="s-grabados">0</div><div class="stat-label">Videos grabados</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:20px">
+    <div>
+      <div class="section-label">Plan de grabación</div>
+      <div class="timeline" id="tl"></div>
+    </div>
+    <div>
+      <div class="section-label">Pendientes críticos</div>
+      <div class="alert alert-yellow"><strong>Script 01</strong> — Decidir Opción A/B/C para footage de Community</div>
+      <div class="alert alert-blue"><strong>Script 09</strong> — Confirmar si el poema está aprobado</div>
+      <div class="alert alert-blue"><strong>Script 11</strong> — Confirmar versión vigente en Drive</div>
+      <hr>
+      <div class="section-label">Colchón de publicación</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center">
+          <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700">0</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px">semanas actuales</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center">
+          <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--green)">3–6</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px">semanas objetivo</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<div id="v-scripts" class="view">
+  <div class="topbar">
+    <div><div class="page-title">Scripts</div><div class="page-sub" id="scripts-sub"></div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost btn-sm" onclick="abrirClaude('script')">✦ Escribir script con Claude</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="filtrar('todos',this)">Todos</button>
+    <button class="tab" onclick="filtrar('listo',this)">Listos</button>
+    <button class="tab" onclick="filtrar('ajuste',this)">Con ajuste</button>
+    <button class="tab" onclick="filtrar('confirmar',this)">Confirmar</button>
+  </div>
+  <div class="card-grid" id="scripts-grid"></div>
+</div>
+
+<!-- IDEAS -->
+<div id="v-ideas" class="view">
+  <div class="topbar">
+    <div><div class="page-title">Banco de Ideas</div><div class="page-sub">Tus decisiones se guardan automáticamente</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-primary btn-sm" onclick="abrirClaude('ideas')">✦ Generar ideas con Claude</button>
+    </div>
+  </div>
+  <div class="alert alert-blue" style="margin-bottom:20px">Marcá cada idea como <strong>SÍ / Después / No</strong>. Las marcadas SÍ pasan automáticamente al pipeline.</div>
+  <div id="ideas-grid"></div>
+</div>
+
+<!-- PIPELINE -->
+<div id="v-pipeline" class="view">
+  <div class="topbar">
+    <div><div class="page-title">Pipeline</div><div class="page-sub">Flujo completo de inicio a publicación</div></div>
+  </div>
+  <div class="pipeline-steps">
+    <div class="pipe-step active" onclick="pipe(0,this)"><div class="pipe-num">1</div><div class="pipe-label">Idea</div></div>
+    <div class="pipe-step" onclick="pipe(1,this)"><div class="pipe-num">2</div><div class="pipe-label">Script</div></div>
+    <div class="pipe-step" onclick="pipe(2,this)"><div class="pipe-num">3</div><div class="pipe-label">Pre-prod</div></div>
+    <div class="pipe-step" onclick="pipe(3,this)"><div class="pipe-num">4</div><div class="pipe-label">Edición</div></div>
+    <div class="pipe-step" onclick="pipe(4,this)"><div class="pipe-num">5</div><div class="pipe-label">Publicar</div></div>
+  </div>
+
+  <div class="pipe-content active" id="pc-0">
+    <div class="card">
+      <h3 style="margin-bottom:12px;font-size:15px">Evaluación de idea nueva</h3>
+      <ul class="checklist" id="ck-idea"></ul>
+      <div class="ai-box" style="margin-top:16px">
+        <div class="ai-box-label">✦ Claude evalúa tu idea</div>
+        <div class="ai-box-text">Hola Claude, quiero evaluar esta idea para @cristobaldiazp:
+[DESCRIBE TU IDEA AQUÍ]
+
+Evaluá contra los 7 criterios del canal y revisá solapamiento con los 12 scripts existentes.</div>
+        <button class="ai-box-btn" onclick="abrirClaude('evaluar-idea')">Copiar prompt y abrir Claude →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pipe-content" id="pc-1">
+    <div class="card">
+      <h3 style="margin-bottom:4px;font-size:15px">Estructura del script (60–90s)</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Sin saludo · Sin call to action · Sin presentación</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+        <div style="background:var(--surface);border-radius:8px;padding:12px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--navy2);font-weight:700;letter-spacing:.1em;margin-bottom:4px">0–3s</div><div style="font-weight:600;font-size:13px;margin-bottom:2px">Interrupción</div><div style="font-size:12px;color:var(--muted)">Detiene el scroll. No anuncia el giro.</div></div>
+        <div style="background:var(--surface);border-radius:8px;padding:12px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--navy2);font-weight:700;letter-spacing:.1em;margin-bottom:4px">3–40s</div><div style="font-weight:600;font-size:13px;margin-bottom:2px">Historia mínima</div><div style="font-size:12px;color:var(--muted)">Tensión sostenida sin destino visible.</div></div>
+        <div style="background:var(--surface);border-radius:8px;padding:12px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--navy2);font-weight:700;letter-spacing:.1em;margin-bottom:4px">40–70s</div><div style="font-weight:600;font-size:13px;margin-bottom:2px">Giro</div><div style="font-size:12px;color:var(--muted)">El concepto emerge como consecuencia.</div></div>
+        <div style="background:var(--surface);border-radius:8px;padding:12px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--navy2);font-weight:700;letter-spacing:.1em;margin-bottom:4px">70–90s</div><div style="font-weight:600;font-size:13px;margin-bottom:2px">Remate</div><div style="font-size:12px;color:var(--muted)">La tensión vuelve sin resolverse.</div></div>
+      </div>
+      <div class="section-label">Prueba de 6 puntos</div>
+      <ul class="checklist" id="ck-script"></ul>
+      <div class="ai-box" style="margin-top:16px">
+        <div class="ai-box-label">✦ Claude revisa tu script</div>
+        <div class="ai-box-text">Hola Claude, revisá este script para @cristobaldiazp:
+[PEGÁ TU SCRIPT AQUÍ]
+
+Aplicá la prueba de 6 puntos y la revisión de plataforma. Dame los ajustes necesarios.</div>
+        <button class="ai-box-btn" onclick="abrirClaude('revisar-script')">Copiar prompt y abrir Claude →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pipe-content" id="pc-2">
+    <div class="card">
+      <h3 style="margin-bottom:12px;font-size:15px">Checklist antes de grabar</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div><div class="section-label">Equipo</div><ul class="checklist" id="ck-equipo"></ul></div>
+        <div><div class="section-label">Encuadre y audio</div><ul class="checklist" id="ck-encuadre"></ul></div>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:14px" onclick="resetCks()">↺ Reiniciar checklist</button>
+    </div>
+  </div>
+
+  <div class="pipe-content" id="pc-3">
+    <div class="card">
+      <h3 style="margin-bottom:4px;font-size:15px">Edición con Claude</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Subís el script + el video raw → Claude genera la guía completa de edición</p>
+      <div class="alert alert-blue">Claude analiza tu footage: identifica los mejores takes con timecodes, corta silencios y errores, define texto en pantalla (Playfair Display / Inter en tu paleta), subtítulos y música. Ejecutás en CapCut en ~15 minutos.</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px;text-align:center"><div style="width:18px;height:18px;background:#000;border:1px solid #444;border-radius:3px;margin:0 auto 5px"></div><div style="font-size:10px;color:var(--muted)">#000000</div></div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px;text-align:center"><div style="width:18px;height:18px;background:#2a2a2a;border:1px solid #555;border-radius:3px;margin:0 auto 5px"></div><div style="font-size:10px;color:var(--muted)">#2a2a2a</div></div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px;text-align:center"><div style="width:18px;height:18px;background:#f5f5f5;border-radius:3px;margin:0 auto 5px"></div><div style="font-size:10px;color:var(--muted)">#f5f5f5</div></div>
+        <div style="background:#1a3a52;border:1px solid var(--navy);border-radius:6px;padding:10px;text-align:center"><div style="width:18px;height:18px;background:#1a3a52;border-radius:3px;margin:0 auto 5px"></div><div style="font-size:10px;color:#aaa">#1a3a52</div></div>
+      </div>
+      <div class="ai-box">
+        <div class="ai-box-label">✦ Claude edita tu video</div>
+        <div class="ai-box-text">Hola Claude, quiero editar el Script [NÚMERO] — [TÍTULO].
+Ya grabé el video. Te subo el archivo raw.
+
+Generá la guía completa: mejores takes, timecodes, texto en pantalla, subtítulos y música.</div>
+        <button class="ai-box-btn" onclick="abrirClaude('editar')">Copiar prompt y abrir Claude →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pipe-content" id="pc-4">
+    <div class="card">
+      <h3 style="margin-bottom:12px;font-size:15px">Publicación</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <div style="background:var(--surface);border-radius:8px;padding:12px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--navy2);font-weight:700;letter-spacing:.1em;margin-bottom:5px">TIKTOK</div><div style="font-weight:600;margin-bottom:2px">19:00–21:00</div><div style="font-size:12px;color:var(--muted)">Mar · Mié · Vie</div></div>
+        <div style="background:var(--surface);border-radius:8px;padding:12px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--navy2);font-weight:700;letter-spacing:.1em;margin-bottom:5px">INSTAGRAM</div><div style="font-weight:600;margin-bottom:2px">18:00–20:00</div><div style="font-size:12px;color:var(--muted)">Mar · Mié · Vie</div></div>
+      </div>
+      <div class="ai-box">
+        <div class="ai-box-label">✦ Claude genera tu caption y hashtags</div>
+        <div class="ai-box-text">Hola Claude, quiero publicar el Script [NÚMERO] — [TÍTULO].
+El video está editado.
+
+Generá el caption para TikTok e Instagram, los hashtags y confirmá la hora óptima.</div>
+        <button class="ai-box-btn" onclick="abrirClaude('publicar')">Copiar prompt y abrir Claude →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PUBLICACION -->
+<div id="v-publicacion" class="view">
+  <div class="topbar">
+    <div><div class="page-title">Publicación</div><div class="page-sub">Registro de videos publicados</div></div>
+    <div class="topbar-actions"><button class="btn btn-primary btn-sm" onclick="document.getElementById('m-pub').classList.add('open')">+ Registrar</button></div>
+  </div>
+  <div id="pub-render"></div>
+</div>
+
+<!-- METRICAS -->
+<div id="v-metricas" class="view">
+  <div class="topbar"><div><div class="page-title">Métricas</div><div class="page-sub">Señales de engagement a leer</div></div></div>
+  <div class="alert alert-blue" style="margin-bottom:20px">Las métricas se llenarán cuando empiece la publicación en julio 2026.</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Señal</th><th>Qué significa</th><th>Acción</th></tr></thead>
+      <tbody>
+        <tr><td>Comentarios que citan una frase</td><td style="color:var(--green)">Esa frase resonó</td><td>Usarla en próximos hooks</td></tr>
+        <tr><td>"No entendí pero me quedé"</td><td style="color:var(--green)">El misterio funciona</td><td>Mantener entrada oblicua</td></tr>
+        <tr><td>"Esto me pasó"</td><td style="color:var(--green)">El reconocimiento funcionó</td><td>Más mecanismos cotidianos</td></tr>
+        <tr><td>Completion rate &lt; 30%</td><td style="color:var(--yellow)">Problema en primeros 15s</td><td>Revisar ritmo del hook</td></tr>
+        <tr><td>Completion rate &gt; 60%</td><td style="color:var(--green)">Estructura funcionó</td><td>Replicar el ritmo</td></tr>
+        <tr><td>Guardados altos, likes bajos</td><td style="color:var(--blue)">Contenido de referencia</td><td>Señal positiva para el nicho</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</main>
+
+<!-- MODAL PUBLICAR -->
+<div class="modal-overlay" id="m-pub">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Registrar publicación</div><button class="modal-close" onclick="document.getElementById('m-pub').classList.remove('open')">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label class="label">Script</label><select class="select" id="p-script"></select></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="field"><label class="label">Fecha TikTok</label><input type="date" class="input" id="p-tiktok"></div>
+        <div class="field"><label class="label">Fecha Instagram</label><input type="date" class="input" id="p-ig"></div>
+      </div>
+      <div class="field"><label class="label">Notas</label><textarea class="textarea" id="p-notas" placeholder="Primeras impresiones, engagement inicial..."></textarea></div>
+      <button class="btn btn-primary" style="width:100%" onclick="guardar()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SC=[
+  {n:'01',t:'Utilidad Marginal Decreciente',s:'Community + Gossen',f:'Conexión Improbable',e:'ajuste',se:6,cr:[45,55],q:'La galleta es la misma. Troy no.',a:'Hook no puede depender del reconocimiento de Community.'},
+  {n:'02',t:'Falacia del Costo Hundido',s:'Thaler + Kahneman',f:'Sin formato',e:'listo',se:1,cr:[55,65],q:'El pasado es punto de referencia, no de residencia.',a:null},
+  {n:'03',t:'Aversión a la Pérdida',s:'Kahneman + Tversky',f:'Sin formato',e:'listo',se:1,cr:[50,60],q:'La pregunta no es si duele soltar. Es si te puedes permitir no hacerlo.',a:'Pausa entre las dos líneas del remate.'},
+  {n:'04',t:'La Zorra y las Uvas',s:'Esopo + Festinger',f:'Historia',e:'ajuste',se:2,cr:[60,70],q:'Las uvas no estaban amargas. Las necesitaba amargas para poder irse.',a:'Terminar en la frase de las uvas — cortar lo que sigue.'},
+  {n:'05',t:'El Costo de Elegir',s:'Barry Schwartz + Kierkegaard',f:'Conexión Improbable',e:'ajuste',se:2,cr:[50,60],q:'Comprometerse con algo no es perder el resto. Es convertirse en alguien.',a:'Elegir entre etimología y Kierkegaard. Quitar "posiblemente" del remate.'},
+  {n:'06',t:'El Conde / Séneca',s:'Larraín + Séneca + amígdala',f:'Sin formato',e:'listo',se:3,cr:[65,75],q:'Eres el arquitecto más eficaz de tu propio sufrimiento.',a:null},
+  {n:'07',t:'El Hombre de Hojalata',s:'El Mago de Oz + William James',f:'Sin formato',e:'ajuste',se:5,cr:[45,55],q:'No le faltaba lo que pedía. Le faltaba una despedida.',a:'"Yo puedo decírtelo. Sí tienes corazón." rompe la voz del canal.'},
+  {n:'08',t:'El Tiempo Solo No Cura',s:'Heráclito + metáfora estanque',f:'Sin formato',e:'listo',se:3,cr:[60,70],q:'Calmar no es lo mismo que curar.',a:null},
+  {n:'09',t:'El No Amor Como Fuente Para Crear',s:'Poema propio — Válvula',f:'Válvula',e:'confirmar',se:5,cr:[70,80],q:'Sin metáforas: no te amo.',a:'Confirmar aprobación. Publicar como video 8–10, no antes.'},
+  {n:'10',t:'Intención, Acción y Juicio',s:'Adam Smith moral',f:'Sin formato',e:'ajuste',se:4,cr:[55,65],q:'A los demás los juzgamos por sus acciones. A nosotros, por nuestras intenciones.',a:'Eliminar "rebalanceo". Evaluar si el remate cierra demasiado.'},
+  {n:'11',t:'El Perdón',s:'Derrida + Jesús en la cruz',f:'Sin formato',e:'confirmar',se:6,cr:[50,60],q:'Lo que sigue es preguntarnos qué implica que alguien haya podido hacer eso.',a:'Confirmar versión en Drive. Pausa larga antes de Derrida.'},
+  {n:'12',t:'Juan 15 / Aristóteles',s:'Evangelio Juan 15 + Ética a Nicómaco',f:'Sin formato',e:'listo',se:4,cr:[55,65],q:'Es la misma decisión, tomada una vez, que se repite cada día.',a:'No publicar junto al Script 01.'},
+];
+const IDEAS=[
+  {l:'A',t:'El Panóptico',s:'Bentham (1787) + redes sociales',d:'No necesitas que alguien te vigile — basta con que puedas ser visto para comportarte como si siempre lo fueras.',h:'"La cámara no necesita estar encendida."',f:'Conexión Improbable',sol:'ninguno',tags:['Bentham','Vigilancia','Autocontrol']},
+  {l:'B',t:'Sapir-Whorf',s:'Lingüística + percepción del color en ruso',d:'El idioma que hablas construye lo que puedes percibir. El ruso tiene dos palabras para azul y sus hablantes distinguen el color más rápido.',h:'Una emoción que sientes pero no puedes nombrar.',f:'Historia',sol:'ninguno',tags:['Lingüística','Percepción','Lenguaje']},
+  {l:'C',t:'Frans de Waal / Capuchinos',s:'Experimento de inequidad (2003)',d:'Los capuchinos rechazan el pepino cuando el otro mono recibe uva. No elegiste compararte. Ya venías así.',h:'El mono tira el pepino con furia. Lleva millones de años haciendo eso.',f:'Historia',sol:'verificar con S03',tags:['Frans de Waal','Inequidad','Evolución']},
+  {l:'D',t:'Dunning-Kruger',s:'Dunning & Kruger (1999)',d:'El pico de la confianza llega exactamente donde termina la comprensión real.',h:'"Hay un momento en que dejas de hacer preguntas. No porque las tengas todas respondidas."',f:'Sin formato',sol:'ninguno',tags:['Metacognición','Ignorancia','Confianza']},
+  {l:'E',t:'Regla del 37%',s:'Problema del secretario',d:'El momento óptimo para elegir es después de haber rechazado el 37% de las opciones. Antes, no tienes criterio. Después, perdiste las mejores.',h:'"¿Cuándo sabes que ya encontraste lo suficientemente bueno?"',f:'Conexión Improbable',sol:'verificar con S05',tags:['Matemáticas','Decisiones','Óptimo']},
+  {l:'F',t:'Zurita / Diogo Jota',s:'Válvula — despedirse para quedarse',d:'La cita de Zurita más Diogo Jota. Dos certezas que deberían producir una conclusión — y no la producen.',h:'Apertura aprobada, desarrollo en refinamiento.',f:'Válvula',sol:'verificar solapamiento',tags:['Zurita','Amor','Muerte']},
+];
+const SESIONES=[{n:1,sc:'02 + 03',d:'Costo Hundido · Aversión a la Pérdida'},{n:2,sc:'04 + 05',d:'La Zorra · El Costo de Elegir'},{n:3,sc:'06 + 08',d:'El Conde · El Tiempo No Cura'},{n:4,sc:'10 + 12',d:'Intención y Juicio · Juan 15'},{n:5,sc:'07 + 09',d:'El Hombre de Hojalata · El Poema'},{n:6,sc:'11 + 01',d:'El Perdón · Utilidad Marginal'}];
+const CKS={
+  idea:['¿Tiene una entrada que nadie anticipa?','¿La tensión produce algo que ninguna parte contenía sola?','¿El remate puede quedar abierto sin que el video se sienta incompleto?','¿No se solapa con los 12 scripts en su incomodidad final?','¿El primer frame puede detener el scroll?','¿El mecanismo es visible sin nombrarlo?','¿La incomodidad toca algo que el espectador vive hoy?'],
+  script:['¿La entrada anuncia hacia dónde va? → si sí, reescribir','¿La frase más fuerte necesita contexto? → si sí, no es la frase más fuerte','¿El concepto ilumina o justifica? → si justifica, eliminarlo','¿El remate resuelve algo? → si sí, cortar la última línea','¿Cristóbal está dentro del problema antes de señalarlo?','¿Alguna línea contradice el libre albedrío o la dignidad de la persona?'],
+  equipo:['iPhone 16e — batería >80%','Micrófono inalámbrico — cargado y conectado','Trípode estable a altura de ojos','Notificaciones del teléfono en silencio'],
+  encuadre:['1080p / 60fps activado — Formato vertical 9:16','Ojos en el tercio superior del frame','Fondo oscuro o neutro (#000 / #2a2a2a)','Luz frontal o en 45° — sin ventana atrás','Test de audio: 5 seg, revisar en auriculares','Mínimo 3 takes completos por script'],
+};
+const PROMPTS={
+  general:'Hola Claude, soy Cristóbal (@cristobaldiazp). El contexto completo del canal está en CLAUDE.md del repo. ¿En qué trabajamos hoy?',
+  script:'Hola Claude, quiero escribir o revisar un script para @cristobaldiazp. El contexto completo está en CLAUDE.md.',
+  ideas:'Hola Claude, el banco de ideas de @cristobaldiazp tiene 6 ideas. Generá 5 ideas nuevas pre-evaluadas con los criterios del canal. Revisá solapamiento con los 12 scripts existentes.',
+  'evaluar-idea':'Hola Claude, quiero evaluar esta idea para @cristobaldiazp:\n[DESCRIBE TU IDEA]\n\nEvaluá contra los 7 criterios del canal y revisá solapamiento con los 12 scripts.',
+  'revisar-script':'Hola Claude, revisá este script para @cristobaldiazp:\n[PEGÁ TU SCRIPT]\n\nAplicá la prueba de 6 puntos y la revisión de plataforma.',
+  editar:'Hola Claude, quiero editar el Script [NÚMERO] — [TÍTULO].\nYa grabé el video raw. Te subo el archivo.\n\nGenerá la guía de edición completa: takes, timecodes, texto en pantalla, subtítulos y música.',
+  publicar:'Hola Claude, quiero publicar el Script [NÚMERO] — [TÍTULO].\nEl video está listo.\n\nGenerá el caption para TikTok e Instagram, los hashtags y confirmá la hora óptima.',
+};
+
+let cks=JSON.parse(localStorage.getItem('cks')||'{}');
+let dec=JSON.parse(localStorage.getItem('dec')||'{}');
+let pubs=JSON.parse(localStorage.getItem('pubs')||'[]');
+
+function goTo(id,el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('v-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+// Timeline
+document.getElementById('tl').innerHTML=SESIONES.map(s=>`<div class="tl-item"><div class="tl-dot">${s.n}</div><div><div class="tl-time">SESIÓN ${s.n}</div><div class="tl-title">Script ${s.sc}</div><div class="tl-desc">${s.d}</div></div></div>`).join('');
+
+// Stats
+document.getElementById('s-listos').textContent=SC.filter(s=>s.e==='listo').length;
+document.getElementById('s-ajuste').textContent=SC.filter(s=>s.e!=='listo').length;
+
+// Scripts
+function badge(e){return e==='listo'?'<span class="badge badge-green">✓ Listo</span>':e==='ajuste'?'<span class="badge badge-yellow">⚠ Ajuste</span>':'<span class="badge badge-blue">⬜ Confirmar</span>'}
+function crC(a){return a>=60?'fill-green':a>=50?'fill-navy':'fill-red'}
+function renderSC(f='todos'){
+  const list=f==='todos'?SC:SC.filter(s=>s.e===f);
+  document.getElementById('scripts-sub').textContent=list.length+' scripts';
+  document.getElementById('scripts-grid').innerHTML=list.map(s=>{const avg=(s.cr[0]+s.cr[1])/2;return`<div class="card"><div class="script-num">SCRIPT ${s.n} · SESIÓN ${s.se}</div><div class="script-title">${s.t}</div><div class="script-sub">${s.s} · ${s.f}</div><div style="margin-bottom:10px">${badge(s.e)}</div><div class="progress-wrap"><div class="progress-label"><span>Completion rate est.</span><span>${s.cr[0]}–${s.cr[1]}%</span></div><div class="progress-bar"><div class="progress-fill ${crC(avg)}" style="width:${avg}%"></div></div></div>${s.a?`<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)"><div style="font-size:10px;color:var(--yellow);font-weight:700;margin-bottom:4px">AJUSTE</div><div style="font-size:12px;color:var(--muted)">${s.a}</div></div>`:''}<div class="script-quote">"${s.q}"</div><button class="btn btn-ghost btn-sm" style="margin-top:12px;width:100%" onclick="abrirScript('${s.n}','${s.t.replace(/'/g,"\\'")}','${(s.a||'').replace(/'/g,"\\'")}')">✦ Trabajar con Claude</button></div>`}).join('');
+}
+function filtrar(f,el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderSC(f)}
+renderSC();
+
+// Ideas
+function setDec(l,d){dec[l]=d;localStorage.setItem('dec',JSON.stringify(dec));renderIdeas()}
+function renderIdeas(){
+  document.getElementById('ideas-grid').innerHTML=IDEAS.map(i=>{
+    const d=dec[i.l]||'pendiente';
+    const b=d==='si'?'<span class="badge badge-green">✓ SÍ</span>':d==='no'?'<span class="badge badge-red">✗ NO</span>':d==='despues'?'<span class="badge badge-navy">↓ Después</span>':'<span class="badge badge-yellow">⬜ Sin decidir</span>';
+    const sol=i.sol==='ninguno'?'<span class="badge badge-green">✓ Sin solapamiento</span>':`<span class="badge badge-yellow">⚠ ${i.sol}</span>`;
+    return`<div class="card" style="margin-bottom:12px"><div style="display:flex;gap:14px;margin-bottom:10px"><div style="font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--navy2);line-height:1;flex-shrink:0">${i.l}</div><div style="flex:1"><div style="font-size:15px;font-weight:600;margin-bottom:2px">${i.t}</div><div style="font-size:12px;color:var(--muted);margin-bottom:6px">${i.s} · ${i.f}</div>${b}</div></div><p style="font-size:13px;color:#999;line-height:1.7;margin-bottom:8px">${i.d}</p><div style="font-style:italic;color:var(--muted);font-size:12px;border-left:2px solid var(--border2);padding-left:10px;margin-bottom:10px">${i.h}</div><div style="margin-bottom:12px">${sol}</div><div style="margin-bottom:12px">${i.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="setDec('${i.l}','si')" style="${d==='si'?'border-color:var(--green);color:var(--green)':''}">✓ SÍ</button><button class="btn btn-ghost btn-sm" onclick="setDec('${i.l}','despues')">↓ Después</button><button class="btn btn-ghost btn-sm" onclick="setDec('${i.l}','no')" style="${d==='no'?'border-color:var(--red);color:var(--red)':''}">✗ No</button></div></div>`;
+  }).join('');
+}
+renderIdeas();
+
+// Pipeline
+function pipe(i,el){document.querySelectorAll('.pipe-step').forEach((s,j)=>s.classList.toggle('active',j===i));document.querySelectorAll('.pipe-content').forEach((c,j)=>c.classList.toggle('active',j===i))}
+
+// Checks
+function renderCk(id,items){
+  const el=document.getElementById('ck-'+id);if(!el)return;
+  el.innerHTML=items.map((item,i)=>{const k=id+i,done=cks[k]||false;return`<li class="check-item"><div class="check-box${done?' done':''}" onclick="tgCk('${k}',this)">${done?'✓':''}</div><span class="check-text${done?' done':''}">${item}</span></li>`}).join('');
+}
+function tgCk(k,el){cks[k]=!cks[k];localStorage.setItem('cks',JSON.stringify(cks));el.classList.toggle('done');el.textContent=cks[k]?'✓':'';el.nextElementSibling.classList.toggle('done',cks[k])}
+function resetCks(){['equipo','encuadre'].forEach(g=>{CKS[g].forEach((_,i)=>delete cks[g+i])});localStorage.setItem('cks',JSON.stringify(cks));renderCk('equipo',CKS.equipo);renderCk('encuadre',CKS.encuadre)}
+renderCk('idea',CKS.idea);renderCk('script',CKS.script);renderCk('equipo',CKS.equipo);renderCk('encuadre',CKS.encuadre);
+
+// Publicaciones
+function guardar(){const p={sc:document.getElementById('p-script').value,tt:document.getElementById('p-tiktok').value,ig:document.getElementById('p-ig').value,n:document.getElementById('p-notas').value};pubs.unshift(p);localStorage.setItem('pubs',JSON.stringify(pubs));document.getElementById('m-pub').classList.remove('open');renderPubs()}
+function renderPubs(){const el=document.getElementById('pub-render');if(!pubs.length){el.innerHTML='<div style="text-align:center;padding:48px 20px;color:var(--muted)"><div style="font-size:40px;margin-bottom:10px">◌</div><div>Sin publicaciones todavía.</div><div style="font-size:12px;margin-top:4px">Inicio julio 2026.</div></div>';return}el.innerHTML='<table><thead><tr><th>Script</th><th>TikTok</th><th>Instagram</th><th>Notas</th></tr></thead><tbody>'+pubs.map(p=>`<tr><td>${p.sc}</td><td>${p.tt||'—'}</td><td>${p.ig||'—'}</td><td style="color:var(--muted)">${p.n||'—'}</td></tr>`).join('')+'</tbody></table>'}
+const sel=document.getElementById('p-script');sel.innerHTML=SC.map(s=>`<option>Script ${s.n} — ${s.t}</option>`).join('');
+renderPubs();
+
+// Claude bridge
+function abrirClaude(tipo){const p=PROMPTS[tipo]||PROMPTS.general;navigator.clipboard.writeText(p).catch(()=>{});alert('✦ Prompt copiado.\n\nPegalo en Claude Code cuando abra la ventana.');window.open('https://claude.ai/code','_blank')}
+function abrirScript(n,t,a){const p=`Hola Claude, quiero trabajar en el Script ${n} — "${t}" para @cristobaldiazp.\n\n${a?`Ajuste pendiente: ${a}\n\n`:''}El contexto completo está en CLAUDE.md. ¿Qué necesito hacer con este script?`;navigator.clipboard.writeText(p).catch(()=>{});alert('✦ Prompt copiado.\n\nPegalo en Claude Code cuando abra la ventana.');window.open('https://claude.ai/code','_blank')}
+</script>
+</body>
+</html>
